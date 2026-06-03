@@ -1,395 +1,423 @@
 import os
-import csv
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# ----------------------------
-# Global data storage
-# ----------------------------
-students = []          # for student registration and records
-student_ids = []       # for sorting/searching
-course_list = []       # for course enrollment
-event_a = set()
-event_b = set()
-
-FILE_NAME = "student_records.txt"
+try:
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+except ImportError as e:
+    print(f"Error importing modules: {e}")
 
 
-# ----------------------------
-# Q1: Student Registration and Grade Evaluation
-# ----------------------------
 def student_registration():
-    print("\n--- Student Registration and Grade Evaluation ---")
-    name = input("Enter student name: ")
-    roll_no = input("Enter roll number: ")
-    marks = float(input("Enter exam score: "))
+    print("\n========================================")
+    print("  1: Student Registration")
+    print("========================================")
 
-    if marks >= 90:
-        grade = "A+"
-        remark = "Excellent"
-    elif marks >= 80:
+    student_name = input("Enter student name: ")
+    score = float(input("Enter exam score (0-100): "))
+
+    if score >= 90 and score <= 100:
         grade = "A"
-        remark = "Very Good"
-    elif marks >= 70:
+        remark = "Excellent"
+    elif score >= 75:
         grade = "B"
-        remark = "Good"
-    elif marks >= 60:
+        remark = "Very Good"
+    elif score >= 60:
         grade = "C"
+        remark = "Good"
+    elif score >= 40:
+        grade = "D"
         remark = "Average"
     else:
         grade = "F"
         remark = "Needs Improvement"
 
-    student = {
-        "name": name,
-        "roll_no": roll_no,
-        "marks": marks,
-        "grade": grade,
-        "remark": remark
-    }
-    students.append(student)
-    student_ids.append(int(roll_no) if roll_no.isdigit() else len(student_ids) + 1)
-
-    print("\nStudent Registered Successfully")
-    print("Name:", name)
-    print("Roll No:", roll_no)
-    print("Marks:", marks)
+    print("\n--- Student Report ---")
+    print("Name:", student_name)
+    print("Score:", score)
     print("Grade:", grade)
-    print("Remark:", remark)
+    print("Performance Remark:", remark)
+
+    return student_name, score, grade, remark
 
 
-# ----------------------------
-# Q2: Course Enrollment Management
-# ----------------------------
+# -------------------- LAB 2 -------------------
+#          Course Enrollment Management System
+
 def course_enrollment():
-    print("\n--- Course Enrollment Management ---")
+    print("\n========================================")
+    print("   2: Course Enrollment")
+    print("========================================")
+
+    courses = []
     max_courses = 5
-    count = 0
 
+    print("=== Course Enrollment System ===")
     while True:
-        if count >= max_courses:
-            print("Maximum course limit reached.")
+        if len(courses) >= max_courses:
+            print("Maximum course limit reached!")
             break
 
-        course_name = input("Enter course name (or type 'stop' to end): ")
-        if course_name.lower() == "stop":
+        course_name = input("Enter course name (or 'done' to finish): ")
+        if course_name.lower() == "done":
             break
 
-        try:
-            credits = int(input("Enter credit value: "))
-            if credits <= 0:
-                print("Invalid credits. Skipping this course.")
-                continue
-        except ValueError:
-            print("Invalid input. Skipping this course.")
+        credits = input("Enter credit value: ")
+
+        if not credits.isdigit():
+            print("Invalid credit value! Skipping entry...")
             continue
 
-        course_list.append({"course": course_name, "credits": credits})
-        count += 1
-        print("Course added successfully.")
+        credits = int(credits)
+        if credits <= 0:
+            print("Credit must be positive! Skipping entry...")
+            continue
+
+        courses.append((course_name, credits))
+        print(f"Course '{course_name}' with {credits} credits added.\n")
+
+    print("\n--- Enrollment Report ---")
+    for course, credit in courses:
+        print(f"Course: {course}, Credits: {credit}")
+    print("Total courses enrolled:", len(courses))
+
+    return courses
 
 
-# ----------------------------
-# Q3: Student Record Management using lists, dicts, sets
-# ----------------------------
-def record_management():
-    print("\n--- Student Record Data Management ---")
-    while True:
-        print("\n1. Add student record")
-        print("2. Display all records")
-        print("3. Event participation using sets")
-        print("4. Back to main menu")
+# -------------------- LAB3---------------------
+#       Student Record Data Management using Data Structures
 
-        choice = input("Enter choice: ")
+def student_records():
+    print("\n========================================")
+    print("   3: Student Record Management")
+    print("========================================")
 
-        if choice == "1":
-            name = input("Enter student name: ")
-            age = int(input("Enter age: "))
-            grade = input("Enter grade: ")
-            students.append({"name": name, "age": age, "grade": grade})
-            print("Record added.")
+    students = []
+    students.append({"name": "Priya",  "age": 20, "grades": [85, 90, 78]})
+    students.append({"name": "Rahul",  "age": 21, "grades": [72, 88, 91]})
+    students.append({"name": "Anita",  "age": 19, "grades": [95, 89, 92]})
 
-        elif choice == "2":
-            if not students:
-                print("No records found.")
-            else:
-                for i, s in enumerate(students, start=1):
-                    print(i, s)
+    print("=== Student Records ===")
+    for student in students:
+        print("Name:", student["name"])
+        print("Age:", student["age"])
+        print("Grades:", student["grades"])
+        print("-----------------------")
 
-        elif choice == "3":
-            print("Enter students for Event A (comma separated names):")
-            a = input().split(",")
-            print("Enter students for Event B (comma separated names):")
-            b = input().split(",")
+    event_A = {"Priya", "Rahul", "Anita", "Kiran"}
+    event_B = {"Rahul", "Anita", "Sneha"}
 
-            global event_a, event_b
-            event_a = set(name.strip() for name in a if name.strip())
-            event_b = set(name.strip() for name in b if name.strip())
+    common_participants = event_A & event_B
+    all_participants   = event_A | event_B
+    only_event_A       = event_A - event_B
 
-            print("Event A participants:", event_a)
-            print("Event B participants:", event_b)
-            print("Common participants:", event_a.intersection(event_b))
-            print("Only in Event A:", event_a - event_b)
-            print("Only in Event B:", event_b - event_a)
+    print("\n=== Event Participation Analysis ===")
+    print("Common Participants:", common_participants)
+    print("All Participants:", all_participants)
+    print("Only Event A Participants:", only_event_A)
 
-        elif choice == "4":
-            break
-
-        else:
-            print("Invalid choice.")
+    return students
 
 
-# ----------------------------
-# Q4: Sorting and Searching of Student IDs
-# ----------------------------
-def bubble_sort(arr):
-    n = len(arr)
+# -------------------- LAB4---------------------
+#          Sorting and Searching of Student IDs
+
+def search_sort_students():
+    print("\n========================================")
+    print("   4: Search and Sort Students")
+    print("========================================")
+
+    student_ids = [105, 102, 110, 108, 101, 115]
+    print("Original IDs:", student_ids)
+
+    # Bubble Sort
+    n = len(student_ids)
     for i in range(n):
         for j in range(0, n - i - 1):
-            if arr[j] > arr[j + 1]:
-                arr[j], arr[j + 1] = arr[j + 1], arr[j]
-    return arr
+            if student_ids[j] > student_ids[j + 1]:
+                temp = student_ids[j]
+                student_ids[j] = student_ids[j + 1]
+                student_ids[j + 1] = temp
+    print("Sorted IDs (Bubble Sort):", student_ids)
 
+    # Selection Sort
+    student_ids2 = [105, 102, 110, 108, 101, 115]
+    n = len(student_ids2)
+    for i in range(n):
+        min_index = i
+        for j in range(i + 1, n):
+            if student_ids2[j] < student_ids2[min_index]:
+                min_index = j
+        temp = student_ids2[i]
+        student_ids2[i] = student_ids2[min_index]
+        student_ids2[min_index] = temp
+    print("Sorted IDs (Selection Sort):", student_ids2)
 
-def linear_search(arr, key):
-    for i in range(len(arr)):
-        if arr[i] == key:
-            return i
-    return -1
+    # Linear Search
+    target = int(input("Enter Student ID to search: "))
+    found_index = -1
+    for i in range(len(student_ids)):
+        if student_ids[i] == target:
+            found_index = i
+            break
 
+    if found_index != -1:
+        print("Linear Search: ID", target, "found at index", found_index)
+    else:
+        print("Linear Search: ID not found")
 
-def binary_search(arr, key):
+    # Binary Search
     low = 0
-    high = len(arr) - 1
+    high = len(student_ids) - 1
+    found_index = -1
     while low <= high:
         mid = (low + high) // 2
-        if arr[mid] == key:
-            return mid
-        elif arr[mid] < key:
+        if student_ids[mid] == target:
+            found_index = mid
+            break
+        elif student_ids[mid] < target:
             low = mid + 1
         else:
             high = mid - 1
-    return -1
 
-
-def search_and_sort():
-    print("\n--- Sorting and Searching of Student IDs ---")
-    ids = []
-    n = int(input("How many student IDs do you want to enter? "))
-
-    for i in range(n):
-        sid = int(input(f"Enter ID {i + 1}: "))
-        ids.append(sid)
-
-    sorted_ids = bubble_sort(ids.copy())
-    print("Sorted IDs:", sorted_ids)
-
-    key = int(input("Enter student ID to search: "))
-    pos1 = linear_search(sorted_ids, key)
-    pos2 = binary_search(sorted_ids, key)
-
-    if pos1 != -1:
-        print("Linear Search: Found at position", pos1)
+    if found_index != -1:
+        print("Binary Search: ID", target, "found at index", found_index)
     else:
-        print("Linear Search: Not found")
-
-    if pos2 != -1:
-        print("Binary Search: Found at position", pos2)
-    else:
-        print("Binary Search: Not found")
+        print("Binary Search: ID not found")
 
 
-# ----------------------------
-# Q5: Fee Calculation using Functions
-# ----------------------------
-def calculate_fee(tuition_fee, hostel_fee=0, transport_fee=0):
-    return tuition_fee + hostel_fee + transport_fee
+# -------------------- LAB 5---------------------
+#          Student Fee Calculation using Functions
 
+def calculate_fee(tuition_fee, hostel_fee=0, transportation_fee=0):
+    total_fee = tuition_fee + hostel_fee + transportation_fee
+    return total_fee
 
 def fee_calculation():
-    print("\n--- Student Fee Calculation ---")
-    tuition = float(input("Enter tuition fee: "))
-    hostel = input("Enter hostel fee (press Enter if none): ")
-    transport = input("Enter transportation fee (press Enter if none): ")
+    print("\n========================================")
+    print("   5: Fee Calculation")
+    print("========================================")
 
-    hostel_fee = float(hostel) if hostel.strip() != "" else 0
-    transport_fee = float(transport) if transport.strip() != "" else 0
+    tuition    = float(input("Enter tuition fee: "))
+    hostel     = float(input("Enter hostel fee (0 if not applicable): "))
+    transport  = float(input("Enter transportation fee (0 if not applicable): "))
 
-    total = calculate_fee(tuition, hostel_fee, transport_fee)
-    print("Total Payable Fee:", total)
+    total = calculate_fee(tuition, hostel_fee=hostel, transportation_fee=transport)
 
+    print("\n--- Fee Report ---")
+    print(f"Tuition Fee       : {tuition}")
+    print(f"Hostel Fee        : {hostel}")
+    print(f"Transportation Fee: {transport}")
+    print(f"Total Fee         : {total}")
 
-# ----------------------------
-# Q6: File Handling for Student Academic Records
-# ----------------------------
-def file_handling():
-    print("\n--- File Handling for Student Academic Records ---")
-    while True:
-        print("\n1. Write records to file")
-        print("2. Read records from file")
-        print("3. Generate simple report")
-        print("4. Back to main menu")
-
-        choice = input("Enter choice: ")
-
-        if choice == "1":
-            with open(FILE_NAME, "w") as f:
-                for s in students:
-                    f.write(str(s) + "\n")
-            print("Records saved to file.")
-
-        elif choice == "2":
-            try:
-                with open(FILE_NAME, "r") as f:
-                    data = f.read()
-                    print("\n--- File Content ---")
-                    print(data if data else "File is empty.")
-            except FileNotFoundError:
-                print("File not found.")
-
-        elif choice == "3":
-            try:
-                with open(FILE_NAME, "r") as f:
-                    lines = f.readlines()
-                    print("Total records in file:", len(lines))
-            except FileNotFoundError:
-                print("File not found.")
-
-        elif choice == "4":
-            break
-
-        else:
-            print("Invalid choice.")
+    return total
 
 
-# ----------------------------
-# Q7: Directory Scanning with Exception Handling
-# ----------------------------
-class DirectoryError(Exception):
+# -------------------- LAB 6---------------------
+#       File Handling for Student Academic Records
+
+def file_management():
+    print("\n========================================")
+    print("  6: File Management")
+    print("========================================")
+
+    # Write student details to a file
+    with open("student_records.txt", "w") as file:
+        file.write("ID,Name,Marks\n")
+        file.write("101,Arjun,85\n")
+        file.write("102,Meera,92\n")
+        file.write("103,Ravi,76\n")
+        file.write("104,Anita,89\n")
+    print("Student records written to file successfully.")
+
+    # Read stored records from the file
+    print("\nReading stored records:")
+    with open("student_records.txt", "r") as file:
+        records = file.readlines()
+        for record in records:
+            print(record.strip())
+
+    # Process stored data to generate a simple report
+    print("\nGenerating Report:")
+    total_students = 0
+    total_marks = 0
+    highest_marks = -1
+    top_student = ""
+
+    for record in records[1:]:
+        parts = record.strip().split(",")
+        name  = parts[1]
+        marks = int(parts[2])
+
+        total_students += 1
+        total_marks += marks
+        if marks > highest_marks:
+            highest_marks = marks
+            top_student = name
+
+    average_marks = total_marks / total_students
+    print("Total Students:", total_students)
+    print("Average Marks:", average_marks)
+    print("Top Student:", top_student, "with", highest_marks, "marks")
+
+
+# -------------------- LAB 7---------------------
+#         Directory Scanning with Exception Handling
+
+class MissingFileOrFolderError(Exception):
+    """Raised when a required file or folder is missing in the directory."""
     pass
 
-
-def scan_directory(path, level=0):
-    if not os.path.exists(path):
-        raise DirectoryError("Invalid directory path")
-
-    for item in os.listdir(path):
-        item_path = os.path.join(path, item)
-        print("    " * level + "|-- " + item)
-        if os.path.isdir(item_path):
-            scan_directory(item_path, level + 1)
-
-
-def directory_scanning():
-    print("\n--- Directory Scanning with Exception Handling ---")
-    path = input("Enter directory path: ")
-
+def scan_directory(path):
     try:
-        scan_directory(path)
-    except DirectoryError as e:
-        print("Custom Error:", e)
-    except PermissionError:
-        print("Permission denied.")
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Invalid directory path: {path}")
+
+        print(f"\nScanning directory: {path}\n")
+
+        for root, dirs, files in os.walk(path):
+            level      = root.replace(path, "").count(os.sep)
+            indent     = " " * 4 * level
+            sub_indent = " " * 4 * (level + 1)
+            print(f"{indent}{os.path.basename(root)}/")
+            for f in files:
+                print(f"{sub_indent}{f}")
+
+            if not files and not dirs:
+                raise MissingFileOrFolderError(f"Empty folder detected: {root}")
+
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+    except MissingFileOrFolderError as e:
+        print(f"Custom Error: {e}")
     except Exception as e:
-        print("Error:", e)
+        print(f"Unexpected Error: {e}")
+
+def directory_scanner():
+    print("\n========================================")
+    print("   MODULE 7: Directory Scanner")
+    print("========================================")
+
+    directory_path = input("Enter the directory path to scan: ")
+    scan_directory(directory_path)
 
 
-# ----------------------------
-# Q8: Student Performance Analysis using NumPy, Pandas, Matplotlib
-# ----------------------------
-def performance_analysis():
-    print("\n--- Student Performance Analysis ---")
-    file_path = input("Enter CSV file path (or press Enter for sample.csv): ").strip()
+# -------------------- LAB 8---------------------
+#   Student Performance Analysis using NumPy, Pandas, Matplotlib
 
-    if file_path == "":
-        file_path = "sample.csv"
+def performance_analytics():
+    print("\n========================================")
+    print("   MODULE 8: Performance Analytics")
+    print("========================================")
 
-    # create sample CSV if not exists
-    if not os.path.exists(file_path):
-        df_sample = pd.DataFrame({
-            "Name": ["Asha", "Bharat", "Chandu", "Divya", "Esha"],
-            "Marks": [85, 72, 91, 64, 78]
-        })
-        df_sample.to_csv(file_path, index=False)
-        print("Sample CSV created:", file_path)
+    # Create a sample CSV if it doesn't exist
+    sample_data = "Name,Math,Science,English\nArjun,85,78,88\nMeera,92,95,90\nRavi,76,82,70\nAnita,89,91,85\nKiran,70,68,75\n"
+    if not os.path.exists("student_performance.csv"):
+        with open("student_performance.csv", "w") as f:
+            f.write(sample_data)
+        print("Sample CSV created: student_performance.csv")
 
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv("student_performance.csv")
 
-        print("\nData:")
-        print(df)
+        print("\n--- Raw Data ---")
+        print(df.head())
 
-        marks = df["Marks"].to_numpy()
-
-        print("\nStatistical Summary:")
-        print("Mean:", np.mean(marks))
-        print("Max:", np.max(marks))
-        print("Min:", np.min(marks))
-        print("Median:", np.median(marks))
-
-        print("\nPandas Description:")
+        print("\n--- Statistical Summary ---")
         print(df.describe())
 
-        plt.figure(figsize=(8, 5))
-        plt.bar(df["Name"], df["Marks"])
-        plt.xlabel("Student Name")
-        plt.ylabel("Marks")
-        plt.title("Student Performance Analysis")
-        plt.xticks(rotation=45)
+        scores = df[["Math", "Science", "English"]].to_numpy()
+
+        mean_scores   = np.mean(scores,   axis=0)
+        median_scores = np.median(scores, axis=0)
+        std_dev_scores = np.std(scores,   axis=0)
+
+        print("\n--- NumPy Analysis ---")
+        print(f"Mean Scores   (Math, Science, English): {mean_scores}")
+        print(f"Median Scores (Math, Science, English): {median_scores}")
+        print(f"Standard Dev  (Math, Science, English): {std_dev_scores}")
+
+        top_math    = df.loc[df["Math"].idxmax(),    "Name"]
+        top_science = df.loc[df["Science"].idxmax(), "Name"]
+        top_english = df.loc[df["English"].idxmax(), "Name"]
+
+        print("\n--- Top Performers ---")
+        print(f"Math   : {top_math}")
+        print(f"Science: {top_science}")
+        print(f"English: {top_english}")
+
+        # Bar chart – average scores per subject
+        subjects = ["Math", "Science", "English"]
+        plt.figure()
+        plt.bar(subjects, mean_scores, color=["blue", "green", "orange"])
+        plt.title("Average Scores per Subject")
+        plt.xlabel("Subjects")
+        plt.ylabel("Average Score")
         plt.tight_layout()
+        plt.savefig("avg_scores.png")
         plt.show()
+        print("Chart saved as avg_scores.png")
 
+        # Student-wise performance comparison
+        df.plot(x="Name", y=["Math", "Science", "English"], kind="bar")
+        plt.title("Student Performance Comparison")
+        plt.ylabel("Scores")
+        plt.tight_layout()
+        plt.savefig("student_performance.png")
+        plt.show()
+        print("Chart saved as student_performance.png")
+
+    except FileNotFoundError:
+        print("Error: The CSV file was not found. Please check the file path.")
     except Exception as e:
-        print("Error in performance analysis:", e)
+        print(f"Unexpected Error: {e}")
 
 
-# ----------------------------
-# Main Dashboard
-# ----------------------------
-def main_menu():
+# -------------------- INTEGRATION----------------
+#         Main System Application Dashboard
+# ============================================================
+
+def main():
+    print("\n" + "=" * 50)
+    print("   SMART CAMPUS INFORMATION SYSTEM")
+    print("   Main Application Dashboard")
+    print("=" * 50)
+
     while True:
-        print("\n===================================")
-        print("SMART CAMPUS INFORMATION SYSTEM")
-        print("===================================")
+        print("\n--- Main Menu ---")
         print("1. Student Registration and Grade Evaluation")
         print("2. Course Enrollment Management")
-        print("3. Student Record Management")
-        print("4. Sorting and Searching of Student IDs")
-        print("5. Student Fee Calculation")
-        print("6. File Handling for Student Academic Records")
-        print("7. Directory Scanning with Exception Handling")
-        print("8. Student Performance Analysis")
+        print("3. Student Record Data Management")
+        print("4. Search and Sort Student Data")
+        print("5. Fee Calculation")
+        print("6. File Management – Academic Records")
+        print("7. Directory Scanner")
+        print("8. Performance Analytics (NumPy/Pandas/Matplotlib)")
         print("9. Exit")
-        print("===================================")
 
-        try:
-            choice = int(input("Enter your choice: "))
-        except ValueError:
-            print("Please enter a valid number.")
-            continue
+        choice = input("\nEnter your choice (1-9): ")
 
-        if choice == 1:
+        if choice == "1":
             student_registration()
-        elif choice == 2:
+        elif choice == "2":
             course_enrollment()
-        elif choice == 3:
-            record_management()
-        elif choice == 4:
-            search_and_sort()
-        elif choice == 5:
+        elif choice == "3":
+            student_records()
+        elif choice == "4":
+            search_sort_students()
+        elif choice == "5":
             fee_calculation()
-        elif choice == 6:
-            file_handling()
-        elif choice == 7:
-            directory_scanning()
-        elif choice == 8:
-            performance_analysis()
-        elif choice == 9:
-            print("Exiting program. Thank you!")
+        elif choice == "6":
+            file_management()
+        elif choice == "7":
+            directory_scanner()
+        elif choice == "8":
+            performance_analytics()
+        elif choice == "9":
+            print("\nExiting Smart Campus Information System. Goodbye!")
             break
         else:
-            print("Invalid choice. Try again.")
+            print("Invalid choice! Please enter a number between 1 and 9.")
 
 
-main_menu()
+if __name__ == "__main__":
+    main()
